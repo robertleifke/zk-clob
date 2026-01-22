@@ -17,3 +17,7 @@ pgo-data.profdata
 
 # Env
 .env.vscode/
+
+# generated
+contracts/testdata/proof.json
+contracts/testdata/*.json
