@@ -1,0 +1,19 @@
+[package]
+name = "clob-core"
+version = "0.1.0"
+edition = "2021"
+
+[features]
+default = ["std"]
+std = ["alloc", "k256/std"]
+alloc = []
+debug_merkle = []
+
+[dependencies]
+tiny-keccak = { version = "2.0.2", default-features = false, features = ["keccak"] }
+uint = { version = "0.9.5", default-features = false }
+hashbrown = "0.14.5"
+k256 = { version = "0.13.3", default-features = false, features = ["ecdsa", "arithmetic", "alloc"] }
+
+[dev-dependencies]
+hex = "0.4.3"

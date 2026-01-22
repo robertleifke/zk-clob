@@ -1,0 +1,22 @@
+[package]
+name = "clob-host"
+version = "0.1.0"
+edition = "2021"
+default-run = "clob-host"
+
+[[bin]]
+name = "clob-host"
+path = "src/main.rs"
+
+[dependencies]
+sp1-sdk = "5.0.8"
+clap = { version = "4.5.7", features = ["derive", "env"] }
+serde = { version = "1.0.204", features = ["derive"] }
+serde_json = "1.0.120"
+hex = "0.4.3"
+clob-core = { path = "../core" }
+dotenv = "0.15.0"
+k256 = { version = "0.13.3", features = ["ecdsa"] }
+
+[build-dependencies]
+sp1-build = "5.0.8"

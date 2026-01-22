@@ -1,0 +1,91 @@
+{
+  "chain_id": 1,
+  "venue_id": "0x0909090909090909090909090909090909090909090909090909090909090909",
+  "market_id": "0x0303030303030303030303030303030303030303030303030303030303030303",
+  "rules": {
+    "base_asset_id": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "quote_asset_id": "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "price_scale": "0x0de0b6b3a7640000",
+    "tick_size": "0x0de0b6b3a7640000",
+    "lot_size": "0x01",
+    "taker_fee_bps": 0,
+    "maker_fee_bps": 0,
+    "max_orders_per_batch": 128,
+    "max_matches_per_order": 64,
+    "max_balance": "0xffffffffffffffffffffffffffffffff"
+  },
+  "state": {
+    "balances": [
+      {
+        "account": "0x2b5ad5c4795c026514f8317c7a215e218dccd6cf",
+        "asset": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "available": "0x00",
+        "locked": "0x0a"
+      },
+      {
+        "account": "0x7e5f4552091a69125d5dfcb7b8c2659029395bdf",
+        "asset": "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "available": "0x0a",
+        "locked": "0x00"
+      }
+    ],
+    "nonces": [
+      {
+        "account": "0x7e5f4552091a69125d5dfcb7b8c2659029395bdf",
+        "nonce": 0
+      }
+    ],
+    "orders": [
+      {
+        "order_id": "0x1111111111111111111111111111111111111111111111111111111111111111",
+        "owner": "0x2b5ad5c4795c026514f8317c7a215e218dccd6cf",
+        "side": 1,
+        "tick": 1,
+        "qty_remaining": "0x0a",
+        "tif": 0,
+        "status": 1
+      }
+    ],
+    "order_nodes": [
+      {
+        "order_id": "0x1111111111111111111111111111111111111111111111111111111111111111",
+        "prev": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "next": "0x0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    ],
+    "tick_nodes": [
+      {
+        "side": 1,
+        "tick": 1,
+        "prev": -2147483648,
+        "next": -2147483648,
+        "head": "0x1111111111111111111111111111111111111111111111111111111111111111",
+        "tail": "0x1111111111111111111111111111111111111111111111111111111111111111"
+      }
+    ],
+    "market_best": {
+      "best_bid": -2147483648,
+      "best_ask": 1
+    },
+    "fee_vaults": []
+  },
+  "batch": [
+    {
+      "kind": "place",
+      "trader": "0x7e5f4552091a69125d5dfcb7b8c2659029395bdf",
+      "nonce": 1,
+      "order_id": "0x2222222222222222222222222222222222222222222222222222222222222222",
+      "side": 0,
+      "tif": 1,
+      "tick_index": 1,
+      "qty_base": "0x05",
+      "prev_tick_hint": -2147483648,
+      "next_tick_hint": -2147483648,
+      "signature": "auto",
+      "private_key": "0x0000000000000000000000000000000000000000000000000000000000000001"
+    }
+  ],
+  "batch_seq": 1,
+  "batch_timestamp": 1,
+  "da_commitment": "0x0000000000000000000000000000000000000000000000000000000000000000"
+}

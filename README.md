@@ -1,89 +1,82 @@
-# SP1 Project Template
+# CLOB with Onchain State Verification.
 
-This is a template for creating an end-to-end [SP1](https://github.com/succinctlabs/sp1) project
-that can generate a proof of any RISC-V program.
+This repo implements an offchain orderbook (CLOB) that produces an SP1 proof for each batch of
+matching and state transition; the onchain verifier accepts the new canonical state root only if
+the proof verifies.
 
-## Requirements
+## Repo layout
 
-- [Rust](https://rustup.rs/)
-- [SP1](https://docs.succinct.xyz/docs/sp1/getting-started/install)
+- `crates/core`: shared serialization, keccak hashing, sparse Merkle map, matching engine, rounding, state model
+- `crates/guest/src/main.rs`: SP1 guest that verifies a batch and commits public inputs
+- `crates/host/src/main.rs`: host runner that assembles inputs/witnesses/proofs (JSON-driven, auto-sign)
+- `contracts/src/ClobVerifier.sol`: Solidity verifier that updates canonical state root
+- `contracts/test/ClobVerifier.t.sol`: Solidity unit tests
+- `contracts/test/ClobVerifierFixture.t.sol`: Solidity fixture test
+- `spec/SPEC.md`: normative protocol spec
+- `examples/input.json`: example batch + state input
+- `scripts/run_clob_example.sh`: end-to-end host execution
+- `contracts/testdata/proof.json`: fixture public inputs for Solidity tests
 
-## Running the Project
-
-There are 3 main ways to run this project: execute a program, generate a core proof, and
-generate an EVM-compatible proof.
-
-### Build the Program
-
-The program is automatically built through `script/build.rs` when the script is built.
-
-### Execute the Program
-
-To run the program without generating a proof:
+## Quickstart
 
 ```sh
-cd script
-cargo run --release -- --execute
+cargo test -p clob-core
 ```
-
-This will execute the program and display the output.
-
-### Generate an SP1 Core Proof
-
-To generate an SP1 [core proof](https://docs.succinct.xyz/docs/sp1/generating-proofs/proof-types#core-default) for your program:
 
 ```sh
-cd script
-cargo run --release -- --prove
+sh scripts/run_clob_example.sh
 ```
-
-### Generate an EVM-Compatible Proof
-
-> [!WARNING]
-> You will need at least 16GB RAM to generate a Groth16 or PLONK proof. View the [SP1 docs](https://docs.succinct.xyz/docs/sp1/getting-started/hardware-requirements#local-proving) for more information.
-
-Generating a proof that is cheap to verify on the EVM (e.g. Groth16 or PLONK) is more intensive than generating a core proof.
-
-To generate a Groth16 proof:
 
 ```sh
-cd script
-cargo run --release --bin evm -- --system groth16
+cd contracts && forge test -v
 ```
 
-To generate a PLONK proof:
+## Protocol/Engine overview
 
-```sh
-cargo run --release --bin evm -- --system plonk
+- Spot-only continuous CLOB (limit orders only, GTC/IOC)
+- Deterministic price-time FIFO at each tick; maker-price execution; partial fills allowed
+- Taker fee charged in quote; deterministic rounding (see `spec/SPEC.md`)
+
+## Commitments & Public Inputs
+
+All commitments use Keccak-256. State is a 256-bit sparse Merkle map with:
+- leaf hash `keccak256(0x00 || key32 || valueHash32)` for non-empty values
+- node hash `keccak256(0x01 || left32 || right32)`
+- empty leaf = `0x00..00`
+
+Public input schema (fixed-width, big-endian):
+
+```solidity
+struct PublicInputs {
+    bytes32 prevRoot;
+    bytes32 newRoot;
+    bytes32 batchDigest;
+    bytes32 rulesHash;
+    bytes32 domainSeparator;
+    uint64  batchSeq;
+    uint64  batchTimestamp;
+    bytes32 daCommitment;
+    bytes32 tradesRoot;
+    bytes32 feesRoot;
+}
 ```
 
-These commands will also generate fixtures that can be used to test the verification of SP1 proofs
-inside Solidity.
+See `spec/SPEC.md` for the exact encoding and hashing rules.
 
-### Retrieve the Verification Key
+## How it works
 
-To retrieve your `programVKey` for your on-chain contract, run the following command in `script`:
+- Offchain: build batch + membership proofs; compute `batchDigest` and witness data
+- SP1 guest: verify signatures/nonces, execute deterministic matching, update sparse Merkle root
+- Onchain: Solidity verifier checks proof and updates canonical root
 
-```sh
-cargo run --release --bin vkey
-```
+## Security / determinism guarantees
 
-## Using the Prover Network
+- Signature verification and strict nonce sequencing per account
+- Batch sequencing enforced by `batchSeq`
+- Omission resistance via best-tick pointers + linked-list invariants for ticks/orders
+- Checked arithmetic with balance caps; deterministic rounding rules
+- Byte-precise encoding and hashing; `spec/SPEC.md` is the normative reference
 
-We highly recommend using the [Succinct Prover Network](https://docs.succinct.xyz/docs/network/introduction) for any non-trivial programs or benchmarking purposes. For more information, see the [key setup guide](https://docs.succinct.xyz/docs/network/developers/key-setup) to get started.
+## Spec
 
-To get started, copy the example environment file:
-
-```sh
-cp .env.example .env
-```
-
-Then, set the `SP1_PROVER` environment variable to `network` and set the `NETWORK_PRIVATE_KEY`
-environment variable to your whitelisted private key.
-
-For example, to generate an EVM-compatible proof using the prover network, run the following
-command:
-
-```sh
-SP1_PROVER=network NETWORK_PRIVATE_KEY=... cargo run --release --bin evm
-```
+See `spec/SPEC.md`.

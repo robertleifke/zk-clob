@@ -3,6 +3,9 @@ members = [
     "lib",
     "program",
     "script",
+    "crates/core",
+    "crates/guest",
+    "crates/host",
 ]
 resolver = "2"
 
